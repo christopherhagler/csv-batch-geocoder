@@ -6,7 +6,7 @@ struct api_response {
     char *body;
 };
 
-void make_api_call(const char *url, const char *data, struct api_response *response);
+void make_api_call_get(const char *url, char *parameters, struct api_response *response);
 
 #endif
 

@@ -32,15 +32,12 @@ int main(int argc, char *argv[]) {
         if (num_rows == 0)
             continue;
 
-        char data[num_rows * 2048];
-        data[0] = '\0';
-
         for (int i = 0; i < num_rows; i++) {
-            char row_data[2048];
+            char args[2048];
             snprintf(
-            	row_data, 
-            	sizeof(row_data), 
-            	"{\"place\":\"%s\",\"street\":\"%s\",\"city\":\"%s\",\"province\":\"%s\",\"postal_code\":\"%s\",\"country_code\":\"%s\"}\n",
+            	args, 
+            	sizeof(args), 
+		"%s %s %s %s %s %s",
             	rows[i].place, 
             	rows[i].street, 
             	rows[i].city, 
@@ -48,19 +45,17 @@ int main(int argc, char *argv[]) {
             	rows[i].postal_code, 
             	rows[i].country_code
             );
-            strncat(data, row_data, sizeof(data) - strlen(data) - 1);
+            struct api_response response;
+            make_api_call_get(api_url, args, &response);
+
+            printf("API response status code: %d\n", response.status_code);
+            printf("API response body:\n%s\n", response.body);
+
+            free(response.body);
+            sleep(BATCH_DELAY_SECONDS);
         }
 
-        struct api_response response;
-        make_api_call(api_url, data, &response);
-
-        printf("API response status code: %d\n", response.status_code);
-        printf("API response body:\n%s\n", response.body);
-
-        free(response.body);
         num_rows = 0;
-
-        sleep(BATCH_DELAY_SECONDS);
     }
 
     fclose(input_csv);
